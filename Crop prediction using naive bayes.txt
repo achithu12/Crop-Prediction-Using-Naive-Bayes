@@ -1,0 +1,99 @@
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+# Input data files are available in the read-only "../input/" directory
+# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using "Save & Run All" 
+# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session
+
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+#reading the dataset
+df=pd.read_csv('../input/crop-recommendation-dataset/Crop_recommendation.csv')
+df.head()
+
+
+df.describe()
+sns.heatmap(df.isnull())
+plt.show()
+
+#checking whether the dataset is balanced or not
+sns.countplot(y='label',data=df)
+
+#understanding the correlation between various attributes
+
+sns.pairplot(df, hue = 'label')
+
+//exploring data using jointplot
+sns.jointplot(x="rainfall",y="humidity",data=df[(df['temperature']<30) & (df['rainfall']>120)],hue="label")
+
+
+sns.jointplot(x="K",y="N",data=df[(df['N']>40)&(df['K']>40)],hue="label")
+
+#using boxplot for crops which have rainfall >150
+sns.boxplot(y='label',x='P',data=df[df['rainfall']>150])
+
+#Dividing the dataset into the two parts-determining features/variables and target variable
+
+y=df['label']
+X=df[['N','P','K','temperature','humidity','ph','rainfall']]
+
+# same as pairplot but it will show in colors
+sns.heatmap(X.corr())
+
+
+#Splitting the dataset into two parts-training data and testing data
+
+#importing the librabry
+from sklearn.model_selection import train_test_split
+# importing the Gaussian algorithm
+from sklearn.naive_bayes import GaussianNB
+
+#importing the accuracy score to predict the score after prediction
+from sklearn.metrics import accuracy_score
+
+#splitting the dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.94,random_state=1)
+ 
+gnb=GaussianNB()
+
+#training the model with the x_train dataset
+gnb.fit(X_train,y_train)
+ 
+#predicting the x_test 
+y_pred=gnb.predict(X_test)
+
+#calculating the accuracy_score
+accuracy=accuracy_score(y_test,y_pred)
+
+
+print("Accuracy ",accuracy)
+
+
+#Accuracy_score
+
+Output: Accuracy  0.8776595744680851
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
